@@ -2,8 +2,86 @@
 <header>
 <link rel="stylesheet" href="style.css">
 </header>
-<body>
+<body onload="startGame()">
 <h1>Hi</h1>
    <canvas id="myCanvas" width="300" height="300"></canvas> 
    <script src="javascript.js"></script>
+   <!--this next part is me analizing code from W3 schools-->
+   <script>
+var myGamePiece;
+
+function startGame() {
+    myGamePiece = new component(30, 30, "red", 225, 225);
+    myGameArea.start();
+}
+
+var myGameArea = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+//this makes the canvas
+        this.canvas.width = 480;
+        this.canvas.height = 270;
+//gives it a context so it works
+        this.context = this.canvas.getContext("2d");        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.frameNo = 0;
+        this.interval = setInterval(updateGameArea, 20);
+//event listener tells if you pressed anything
+        window.addEventListener('keydown', function (e) {
+            e.preventDefault();
+            myGameArea.keys = (myGameArea.keys || []);
+            myGameArea.keys[e.keyCode] = (e.type == "keydown");
+        })
+        window.addEventListener('keyup', function (e) {
+            myGameArea.keys[e.keyCode] = (e.type == "keydown");
+        })
+//the comma connects it in some way
+//i think the function refers to whatever function runs the code
+    },
+    stop : function() {
+        clearInterval(this.interval);
+    },    
+    clear : function() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+
+function component(width, height, color, x, y, type) {
+
+    this.type = type;
+    this.width = width;
+    this.height = height;
+    this.speed = 0;
+    this.angle = 0;
+    this.moveAngle = 0;
+    this.x = x;
+    this.y = y;    
+//it defines this.update?
+    this.update = function() {
+        ctx = myGameArea.context;
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+        ctx.fillStyle = color;
+        ctx.fillRect(this.width / -2, this.height / -2, this.width, this.height);
+        ctx.restore();    
+    }
+    this.newPos = function() {
+        this.angle += this.moveAngle * Math.PI / 180;
+        this.x += this.speed * Math.sin(this.angle);
+        this.y -= this.speed * Math.cos(this.angle);
+    }
+}
+//this is where it finds what you press and uses that
+function updateGameArea() {
+    myGameArea.clear();
+    myGamePiece.moveAngle = 0;
+    myGamePiece.speed = 0;
+    if (myGameArea.keys && myGameArea.keys[37]) {myGamePiece.moveAngle = -1; }
+    if (myGameArea.keys && myGameArea.keys[39]) {myGamePiece.moveAngle = 1; }
+    if (myGameArea.keys && myGameArea.keys[38]) {myGamePiece.speed= 1; }
+    if (myGameArea.keys && myGameArea.keys[40]) {myGamePiece.speed= -1; }
+    myGamePiece.newPos();
+    myGamePiece.update();
+}
+</script>
 </body>
